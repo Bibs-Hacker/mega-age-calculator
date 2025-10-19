@@ -1,0 +1,380 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MERA-BRIAN — Mega Age Calculator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --glass: rgba(255,255,255,0.06);
+      --glass-2: rgba(255,255,255,0.04);
+      --accent-1: #ff00cc;
+      --accent-2: #3333ff;
+      --muted: rgba(255,255,255,0.7);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:'Poppins',system-ui,Segoe UI,Roboto,Arial;
+      background: radial-gradient(1200px 600px at 10% 10%, rgba(25,100,204,5.08), transparent 100%),
+                  radial-gradient(1000px 500px at 90% 90%, rgba(20,210,200,3.05), transparent 100%),
+                  linear-gradient(180deg,#05060b 0%, #0b0f1a 100%);
+      color:#fff;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:40px;
+    }/* page layout */
+.wrap{
+  width:min(1200px,98%);
+  display:grid;
+  grid-template-columns: 520px 1fr;
+  gap:28px;
+  align-items:start;
+}
+
+/* left hero */
+.hero{
+  background:linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+  border-radius:20px;
+  padding:28px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
+  border:5px solid rgba(205,250,25,3.04);
+  position:relative;
+  overflow:visible;
+}
+
+.brand{
+  display:flex;align-items:center;gap:14px;margin-bottom:8px
+}
+.logo{
+  width:75px;height:64px;border-radius:12px;background:linear-gradient(135deg,var(--accent-1),var(--accent-2));
+  display:grid;place-items:center;font-weight:800;font-size:20px;color:white;box-shadow:0 6px 20px rgba(0,0,0,0.6)
+}
+h1{margin:0;font-size:20px}
+p.lead{margin:6px 0 18px;color:var(--muted);font-size:14px}
+
+.form{
+  display:grid;gap:10px;margin-top:8px
+}
+.row{display:flex;gap:10px}
+input[type=text], input[type=date], select{
+  background:var(--glass);border:3px solid rgba(255,25,255,4.03);padding:12px;border-radius:10px;color:#fff;font-size:15px;width:100%;
+  transition:transform .18s, box-shadow .18s;
+}
+input:focus, select:focus{transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,0.6)}
+
+.big-btn{display:inline-flex;gap:10px;align-items:center;justify-content:center;padding:12px 18px;border-radius:12px;border:none;cursor:pointer;font-weight:700;background:linear-gradient(90deg,var(--accent-1),var(--accent-2));color:white;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+.ghost{background:transparent;border:5px solid rgba(255,255,255,0.06)}
+
+/* right panel */
+.card{
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-radius:20px;padding:18px;border:5px solid rgba(255,255,255,0.03);min-height:420px;position:relative;overflow:hidden
+}
+.results{
+  display:flex;flex-direction:column;gap:12px;padding:8px 6px
+}
+.metric{
+  background:var(--glass-2);padding:12px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;border:4px solid rgba(255,255,255,0.02)
+}
+.metric h3{margin:0;font-size:14px}
+.metric p{margin:0;font-size:18px;font-weight:800}
+
+.typewriter-wrap{margin-top:12px;min-height:56px;display:flex;align-items:center}
+.typewriter{font-weight:600;font-size:16px;color:#fff;overflow:hidden;border-right:3px solid rgba(255,255,255,0.6);white-space:nowrap}
+
+.controls{display:flex;gap:10px;margin-top:14px}
+
+footer.small{position:absolute;left:18px;bottom:12px;font-size:12px;color:var(--muted)}
+
+/* confetti */
+canvas#confetti{position:fixed;left:0;top:0;pointer-events:none;width:100%;height:100%;z-index:10}
+
+/* music control */
+.music-controls{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.02);padding:8px;border-radius:12px;border:3px solid rgba(20,25,255,1.02)}
+.volume{width:120px}
+
+/* responsive */
+@media (max-width:1000px){
+  .wrap{grid-template-columns:1fr;}
+  .hero{order:2}
+  .card{order:1}
+}
+
+/* fun sparkles */
+.sparkle{position:absolute;width:10px;height:10px;border-radius:50%;opacity:0.12;background:linear-gradient(180deg,#fff,#ffd1f7);filter:blur(6px)}
+
+  </style>
+</head>
+<body><canvas id="confetti"></canvas>
+
+  <div class="wrap" role="main" aria-labelledby="main-title">
+    <section class="hero" aria-label="Calculator form">
+      <div class="brand">
+        <div class="logo">M-B💖</div>
+        <div>
+          <h1 id="main-title">RUTH KERUBO — Mega Age Calculator</h1>
+          <marquee>
+          <p class="lead">Calculate your age in Years / Months / Days, total days lived and countdown to your next birthday. Fun, animated & musical ✨</p>
+          </marquee>
+        </div>
+      </div><div class="form">
+    <input id="name" type="text" placeholder="Your name (e.g. Amina)" aria-label="Name" />
+    <div class="row">
+      <select id="gender" aria-label="Gender">
+        <option value="">Select gender</option>
+        <option value="female">Female</option>
+        <option value="male">Male</option>
+        <option value="other">Other</option>
+      </select>
+      <input id="dob" type="date" aria-label="Date of birth" />
+    </div>
+
+    <div style="display:flex;gap:10px;align-items:center;margin-top:6px">
+      <button class="big-btn" id="calcBtn">Calculate</button>
+      <button class="big-btn ghost" id="resetBtn">Reset</button>
+    </div>
+
+    <div style="display:flex;gap:10px;align-items:center;margin-top:12px">
+      <div class="music-controls">
+        <button id="playPause" title="Play / Pause music">▶︎ Play</button>
+        <input id="vol" class="volume" type="range" min="0" max="1" step="0.01" value="0.25" aria-label="Volume slider" />
+        <button id="muteBtn" title="Mute / Unmute">Mute</button>
+      </div>
+
+      <div style="flex:1;text-align:right;color:var(--muted)">Tip: click 'Calculate' to trigger confetti 🎉</div>
+    </div>
+
+    <div style="margin-top:14px;color:var(--muted);font-size:13px">Made bigger, wider and animated for mega vibes — responsive and mobile friendly.</div>
+
+  </div>
+</section>
+
+<aside class="card" aria-label="Results panel">
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <div>
+      <h2 style="margin:0">Your Age Summary</h2>
+      <div style="color:var(--muted);font-size:13px;margin-top:6px">Clear metrics & a personalised message</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button id="downloadBtn" class="big-btn ghost">Export</button>
+    </div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="metric"><div><h3>Full Age</h3></div><p id="ageFull">—</p></div>
+    <div class="metric"><div><h3>Days Lived</h3></div><p id="daysLived">—</p></div>
+    <div class="metric"><div><h3>Next Birthday</h3></div><p id="nextBD">—</p></div>
+
+    <div class="typewriter-wrap">
+      <div id="typewriter" class="typewriter">Ready when you are — enter your details and hit Calculate ✨</div>
+    </div>
+  </div>
+
+  <footer class="small">MERA-BRIAN • Built with 💖 • Responsive</footer>
+</aside>
+
+  </div>  <!-- Background music (the file is embedded as base64 or referenced — using a royalty-free short sample encoded below is heavy; we'll use a short base64 tiny beep as placeholder). -->  <audio id="bgAudio" loop crossorigin="anonymous">
+    <source src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_2b7f6c0a6b.mp3?filename=soft-film-loop-1-10650.mp3" type="audio/mpeg">
+    <!-- Fallback: user may supply their own file with file picker in future iterations -->
+  </audio>  <script>
+    // --------- Utilities ---------
+    const $ = id => document.getElementById(id);
+
+    // Typewriter helper that types per character then stops
+    function typeWriter(el, text, speed = 40){
+      el.textContent = '';
+      el.style.width = 'auto';
+      let i = 0;
+      function step(){
+        if(i < text.length){
+          el.textContent += text.charAt(i++);
+          setTimeout(step, speed);
+        }
+      }
+      step();
+    }
+
+    // format plural
+    function plural(n, s){ return `${n} ${s}${Math.abs(n)===1?'':'s'}` }
+
+    // --------- Age calculations ---------
+    function calculateAll(){
+      const name = $('name').value.trim();
+      const gender = $('gender').value;
+      const dobVal = $('dob').value;
+      const writer = $('typewriter');
+
+      if(!name || !gender || !dobVal){
+        alert('Please complete name, gender and date of birth.');
+        return;
+      }
+
+      const dob = new Date(dobVal + 'T00:00:00');
+      const now = new Date();
+
+      if(dob > now){ alert('Your date of birth is in the future — please pick a valid date.'); return; }
+
+      // Age in Y M D
+      let y = now.getFullYear() - dob.getFullYear();
+      let m = now.getMonth() - dob.getMonth();
+      let d = now.getDate() - dob.getDate();
+      if(d < 0){
+        m -= 1;
+        const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+        d += prevMonth;
+      }
+      if(m < 0){ y -= 1; m += 12; }
+
+      // total days lived
+      const oneDay = 1000*60*60*24;
+      const daysLived = Math.floor((now - dob)/oneDay);
+
+      // Next birthday
+      let nextBD = new Date(now.getFullYear(), dob.getMonth(), dob.getDate());
+      if(nextBD <= now){ nextBD.setFullYear(nextBD.getFullYear()+1); }
+      const diff = Math.ceil((nextBD - now)/oneDay);
+      const monthsToNext = Math.floor(diff / 30);
+      const daysToNext = diff % 30;
+
+      // Output
+      $('ageFull').textContent = `${y} yrs • ${m} mos • ${d} days`;
+      $('daysLived').textContent = plural(daysLived, 'day');
+      $('nextBD').textContent = `${monthsToNext} months, ${daysToNext} days (in ${diff} days)`;
+
+      // inspirational messages per gender
+      const male = [
+        `Hey ${name}! Level up — every year you ship a better version of yourself. 🚀`,
+        `${name}, your journey is your superpower. Keep coding life with courage. 💪`,
+        `Strong, steady, legendary. ${name}, make this year your masterpiece.`
+      ];
+      const female = [
+        `Hey ${name}! You glow brighter with every chapter. Keep shining ✨`,
+        `${name}, sprinkle the world with your magic — it's hungry for it. 🌸`,
+        `Grace, power, sparkle — now that's your combo, ${name}!` 
+      ];
+      const other = [
+        `Hey ${name}! You're unique — embrace the epic you are. 🌈`,
+        `${name}, keep creating yourself. The world awaits your next move.`
+      ];
+
+      let pool = other;
+      if(gender === 'male') pool = male;
+      if(gender === 'female') pool = female;
+      const msg = pool[Math.floor(Math.random()*pool.length)];
+
+      typeWriter(writer, msg, 36);
+
+      // trigger confetti burst
+      confettiBurst();
+
+      // ensure music is playing (try to start but browsers may require gesture)
+      tryPlayAudio();
+    }
+
+    // --------- Confetti ---------
+    const canvas = document.getElementById('confetti');
+    const ctx = canvas.getContext('2d');
+    let W = canvas.width = innerWidth;
+    let H = canvas.height = innerHeight;
+    window.addEventListener('resize', ()=>{ W=canvas.width=innerWidth; H=canvas.height=innerHeight; });
+
+    function rand(min,max){return Math.random()*(max-min)+min}
+
+    let particles = [];
+    function createParticle(x,y){
+      const size = rand(6,12);
+      const angle = rand(0,Math.PI*2);
+      const speed = rand(2,8);
+      const vx = Math.cos(angle)*speed;
+      const vy = Math.sin(angle)*speed;
+      const hue = Math.floor(rand(0,360));
+      particles.push({x,y,vx,vy,size,hue,life:rand(60,140),tick:0,rot:rand(-0.2,0.2)});
+    }
+
+    function confettiBurst(){
+      const cx = W/2; const cy = H/3;
+      for(let i=0;i<160;i++){ createParticle(rand(0,W), rand(0, H/2)); }
+    }
+
+    // gentle background confetti spawn
+    setInterval(()=>{ createParticle(rand(0,W), -10); if(particles.length>900) particles.splice(0,200); }, 520);
+
+    function render(){
+      ctx.clearRect(0,0,W,H);
+      for(let i=particles.length-1;i>=0;i--){
+        const p = particles[i];
+        p.tick++;
+        p.vy += 0.15; // gravity
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vx *= 0.995;
+        p.vy *= 0.999;
+        p.rot += 0.02;
+        const opacity = 1 - p.tick/p.life;
+        ctx.save();
+        ctx.translate(p.x,p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = `hsla(${p.hue},78%,56%,${opacity})`;
+        ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size*0.6);
+        ctx.restore();
+        if(p.tick > p.life || p.y > H + 40) particles.splice(i,1);
+      }
+      requestAnimationFrame(render);
+    }
+    render();
+
+    // --------- Audio controls ---------
+    const audio = $('bgAudio');
+    const playPause = $('playPause');
+    const vol = $('vol');
+    const muteBtn = $('muteBtn');
+
+    playPause.addEventListener('click', ()=>{
+      if(audio.paused){ audio.play(); playPause.textContent = '⏸ Pause'; }
+      else { audio.pause(); playPause.textContent = '▶︎ Play'; }
+    });
+    vol.addEventListener('input', ()=>{ audio.volume = vol.value; });
+    muteBtn.addEventListener('click', ()=>{ audio.muted = !audio.muted; muteBtn.textContent = audio.muted? 'Unmute' : 'Mute'; });
+
+    // Try to play (best-effort; browsers may block). We'll call play on user gestures.
+    function tryPlayAudio(){
+      audio.volume = vol.value;
+      audio.play().then(()=>{ playPause.textContent = '⏸ Pause'; }).catch(()=>{/* blocked */});
+    }
+
+    // --------- Buttons ---------
+    $('calcBtn').addEventListener('click', calculateAll);
+    $('resetBtn').addEventListener('click', ()=>{
+      $('name').value='';$('gender').value='';$('dob').value='';
+      $('ageFull').textContent='—';$('daysLived').textContent='—';$('nextBD').textContent='—';
+      $('typewriter').textContent = 'Ready when you are — enter your details and hit Calculate ✨';
+    });
+
+    // export simple JSON of results
+    $('downloadBtn').addEventListener('click', ()=>{
+      const data = {
+        name: $('name').value, gender: $('gender').value, dob: $('dob').value,
+        age: $('ageFull').textContent, daysLived: $('daysLived').textContent, nextBirthday: $('nextBD').textContent
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = (data.name||'age') + '-age.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    });
+
+    // small accessibility: allow Enter key to trigger calculate when focused in form
+    ['name','dob'].forEach(id=>{ $(id).addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ calculateAll(); } }); });
+
+    // Quick pretty sparkles (decorative)
+    for(let i=0;i<12;i++){ const s = document.createElement('div'); s.className='sparkle'; s.style.left = `${rand(4,92)}%`; s.style.top = `${rand(4,92)}%`; s.style.opacity = rand(0.06,0.16); s.style.transform = `scale(${rand(0.5,1.6)})`; document.body.appendChild(s); }
+
+    // initial attempt to load audio as muted so some browsers allow autoplay if muted
+    (function initAudio(){ audio.volume = vol.value; /* don't autoplay loudly without user consent */ })();
+
+  </script></body>
+</html>
